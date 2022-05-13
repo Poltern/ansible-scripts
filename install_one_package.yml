@@ -1,0 +1,17 @@
+- hosts: centos
+  become: yes
+  become_user: root
+  become_method: sudo
+
+  tasks:
+    - name: If package installed
+      ansible.builtin.yum:
+        list=package_name
+      register: is_installed
+
+    - name: Install a list of packages 
+      ansible.builtin.yum:
+        name: package_name
+        state: latest
+      when:  (is_installed.results[0].yumstate != 'installed') 
+

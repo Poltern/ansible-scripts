@@ -1,0 +1,29 @@
+- hosts: group
+  become: yes
+  become_user: root
+  become_method: sudo
+  tasks:
+    - name: Create user
+      ansible.builtin.user:
+        name: username
+        #openssl passwd -6 -salt salttext password
+        password: #$6$salttext$thEMR3mKjH5f5OyOR0gWYSelEDEBi73xUuTKwcsG1GAg7f.7q0nPnPJ8kgvQtAjEG1f4MWIt1dvR01.wDWv/G/
+        shell: /bin/bash
+        append: yes
+        update_password: on_create
+
+    - name: Try to add to group sudo
+      ignore_errors: yes
+      ansible.builtin.user:
+        name: username
+        groups: sudo
+        append: yes
+      when: ansible_distribution == 'Ubuntu'
+
+    - name: Try to add to group wheel
+      ignore_errors: yes
+      ansible.builtin.user:
+        name: username
+        groups: wheel
+        append: yes
+      when: ansible_distribution == 'Centos'
