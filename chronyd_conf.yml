@@ -1,0 +1,29 @@
+- hosts: centos
+  become: yes
+  become_user: root
+  become_method: sudo
+
+  tasks:
+    - name: Chrony replace ntp server
+      ansible.builtin.replace:
+        dest: /etc/chrony.conf
+        regexp: '2.centos.pool.ntp.org'
+        replace: 'ntp.servername.ru'
+        backup: yes
+        
+    - name: Append chronyd conf
+      ansible.builtin.lineinfile:
+        path: /etc/chrony.conf
+        line: 'maxdistance 16.0'
+
+    - name: Append chronyd conf
+      ansible.builtin.lineinfile:
+        path: /etc/chrony.conf
+        line: 'maxupdateskew 100.0'
+
+    - name: Enable service chronyd and restart
+      ansible.builtin.systemd:
+        enabled: yes
+        state: restarted
+        daemon_reload: yes
+        name: chronyd
